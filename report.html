@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 2019-08-26 Mon 18:54 -->
+  <meta charset="utf-8">
+  <meta name="viewport" content=
+  "width=device-width, initial-scale=1">
+  <title>Bayesian optimization for demographic history
+  inference</title>
+  <meta name="generator" content="Org mode">
+  <meta name="author" content="Ilia Sheshukov">
+  <meta name="description" content="Summer project report">
+  <style type="text/css">
+  <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+  </style>
+  <link rel="stylesheet" href="typesetter.css">
+  <script type="text/javascript">
+  /*
+  @licstart  The following is the entire license notice for the
+  JavaScript code in this tag.
+
+  Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+  The JavaScript code in this tag is free software: you can
+  redistribute it and/or modify it under the terms of the GNU
+  General Public License (GNU GPL) as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option)
+  any later version.  The code is distributed WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+  As additional permission under GNU GPL version 3 section 7, you
+  may distribute non-source (e.g., minimized or compacted) forms of
+  that code without the copy of the GNU GPL normally required by
+  section 4, provided you include this license notice and a URL
+  through which recipients can access the Corresponding Source.
+
+
+  @licend  The above is the entire license notice
+  for the JavaScript code in this tag.
+  */
+  <!--/*--><![CDATA[/*><!--*/
+  function CodeHighlightOn(elem, id)
+  {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+  }
+  function CodeHighlightOff(elem, id)
+  {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+  }
+  /*]]>*///-->
+  </script>
+</head>
+<body>
+  <div id="content">
+    <header>
+      <h1 class="title">Bayesian optimization for demographic
+      history inference</h1>
+      <p class="subtitle">Summer project report</p>
+    </header>
+    <nav id="table-of-contents">
+      <h2>Table of Contents</h2>
+      <div id="text-table-of-contents">
+        <ul>
+          <li>
+            <a href="#orgce3e808">Introduction</a>
+          </li>
+          <li>
+            <a href="#orgcf3f387">Project goals</a>
+          </li>
+          <li>
+            <a href="#org15f927e">Methods</a>
+          </li>
+          <li>
+            <a href="#orgedd42f3">Results</a>
+            <ul>
+              <li>
+                <a href="#orgdede476">GADMA datasets</a>
+              </li>
+              <li>
+                <a href="#org9fdc0cd">Out of Africa (2
+                populations)</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="#orgf5863fe">Conclusion</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <aside>
+      <p>Source code can be found <a href=
+      "https://github.com/isheshukov/ifmoproject">here</a>.</p>
+    </aside>
+    <div id="outline-container-orgce3e808" class="outline-2">
+      <h2 id="orgce3e808">Introduction</h2>
+    </div>
+    <div id="outline-container-orgcf3f387" class="outline-2">
+      <h2 id="orgcf3f387">Project goals</h2>
+      <div class="outline-text-2" id="text-orgcf3f387">
+        <p>The project goal was to replace a BFGS optimization
+        algorithm used in the tool moments with the Gaussian
+        process based global Bayesian optimization and to study the
+        effects.</p>
+      </div>
+    </div>
+    <div id="outline-container-org15f927e" class="outline-2">
+      <h2 id="org15f927e">Methods</h2>
+      <div class="outline-text-2" id="text-org15f927e">
+        <p>We used <a href=
+        "https://github.com/SheffieldML/GPyOpt/"><code>GPyOpt</code></a>
+        library that, given function and bounding conditions
+        optimizes said function, then we took the optimization
+        routine in <code>moments</code> and replaced their
+        algorithm with the calls to GPyOpt and some other of our
+        changes to make them work together.</p>
+      </div>
+    </div>
+    <div id="outline-container-orgedd42f3" class="outline-2">
+      <h2 id="orgedd42f3">Results</h2>
+      <div class="outline-text-2" id="text-orgedd42f3">
+        <p>We performed a number of test runs to compare tool based
+        on Bayesian optimization with already known optimum values.
+        These results can be seen in following tables:</p>
+      </div>
+      <div id="outline-container-orgdede476" class="outline-3">
+        <h3 id="orgdede476">GADMA datasets</h3>
+        <div class="outline-text-3" id="text-orgdede476">
+          <aside>
+            <p>Every model was tested 10 times.</p>
+          </aside>
+          <table>
+            <colgroup>
+              <col class="org-left">
+              <col class="org-left">
+              <col class="org-left">
+              <col class="org-right">
+              <col class="org-right">
+              <col class="org-right">
+              <col class="org-right">
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col" class="org-left">Organism</th>
+                <th scope="col" class="org-left">Dataset</th>
+                <th scope="col" class="org-left">Model</th>
+                <th scope="col" class="org-right">Average -LL</th>
+                <th scope="col" class="org-right">Best -LL</th>
+                <th scope="col" class="org-right">Average time</th>
+                <th scope="col" class="org-right">Known
+                optimum</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="org-left"><i>E. giletti</i></td>
+                <td class="org-left">all</td>
+                <td class="org-left">A</td>
+                <td class="org-right">-283.541</td>
+                <td class="org-right">-283.535</td>
+                <td class="org-right">00:08:46</td>
+                <td class="org-right">-283.530</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>E. giletti</i></td>
+                <td class="org-left">syn</td>
+                <td class="org-left">A</td>
+                <td class="org-right">-211.612</td>
+                <td class="org-right">-211.608</td>
+                <td class="org-right">00:08:48</td>
+                <td class="org-right">-211.092</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>E. giletti</i></td>
+                <td class="org-left">syn</td>
+                <td class="org-left">B1</td>
+                <td class="org-right">-211.584</td>
+                <td class="org-right">-210.769</td>
+                <td class="org-right">00:12:24</td>
+                <td class="org-right">-210.830</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>E. giletti</i></td>
+                <td class="org-left">syn</td>
+                <td class="org-left">B2</td>
+                <td class="org-right">-214.743</td>
+                <td class="org-right">-210.781</td>
+                <td class="org-right">00:17:10</td>
+                <td class="org-right">-210.760</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">CVLN CVLS</td>
+                <td class="org-left">sec contact asym mig size</td>
+                <td class="org-right">-609.246</td>
+                <td class="org-right">-476.352</td>
+                <td class="org-right">00:36:04</td>
+                <td class="org-right">-455.167</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">CVLN CVLS</td>
+                <td class="org-left">Structure 1 2</td>
+                <td class="org-right">-510.379</td>
+                <td class="org-right">-453.800</td>
+                <td class="org-right">00:35:11</td>
+                <td class="org-right">-453.670</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">CrossRiver CVLN</td>
+                <td class="org-left">anc asym mig size</td>
+                <td class="org-right">-407.200</td>
+                <td class="org-right">-368.336</td>
+                <td class="org-right">02:11:40</td>
+                <td class="org-right">-368.232</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">CrossRiver CVLN</td>
+                <td class="org-left">sec contact asym mig</td>
+                <td class="org-right">-377.898</td>
+                <td class="org-right">-374.555</td>
+                <td class="org-right">00:23:38</td>
+                <td class="org-right">-374.557</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">CrossRiver CVLN</td>
+                <td class="org-left">Structure 1 2</td>
+                <td class="org-right">-388.332</td>
+                <td class="org-right">-365.154</td>
+                <td class="org-right">00:35:16</td>
+                <td class="org-right">-365.181</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">Northern Southern</td>
+                <td class="org-left">sec contact sym mig size</td>
+                <td class="org-right">-601.802</td>
+                <td class="org-right">-413.190</td>
+                <td class="org-right">00:24:46</td>
+                <td class="org-right">-411.619</td>
+              </tr>
+              <tr>
+                <td class="org-left"><i>S. gabonicus</i></td>
+                <td class="org-left">Northern Southern</td>
+                <td class="org-left">Structure 1 2</td>
+                <td class="org-right">-589.171</td>
+                <td class="org-right">-402.121</td>
+                <td class="org-right">00:34:40</td>
+                <td class="org-right">-402.165</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="outline-container-org9fdc0cd" class="outline-3">
+        <h3 id="org9fdc0cd">Out of Africa (2 populations)</h3>
+        <div class="outline-text-3" id="text-org9fdc0cd">
+          <aside>
+            <p>Model ran 50 times. Known optimum is -1066.822.</p>
+          </aside>
+          <table>
+            <colgroup>
+              <col class="org-left">
+              <col class="org-right">
+              <col class="org-right">
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col" class="org-left">&nbsp;</th>
+                <th scope="col" class="org-right">Server time</th>
+                <th scope="col" class="org-right">-LL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="org-left">Average</td>
+                <td class="org-right">00:20:39</td>
+                <td class="org-right">-1069.0656</td>
+              </tr>
+              <tr>
+                <td class="org-left">Best</td>
+                <td class="org-right">00:20:03</td>
+                <td class="org-right">-1066.473</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="outline-container-orgf5863fe" class="outline-2">
+      <h2 id="orgf5863fe">Conclusion</h2>
+      <div class="outline-text-2" id="text-orgf5863fe">
+        <p>Results show that new method may be faster than
+        <code>GADMA</code> for datasets with more than 3
+        populations and works more or less the same for small
+        number of populations.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
