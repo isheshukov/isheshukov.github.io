@@ -234,3 +234,9 @@ aside {
 div.footnotes {
   font-size: 0.75rem;
 }
+
+figcaption{
+    width:100%;
+    text-align:center;
+    padding:10px;
+}

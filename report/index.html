@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- 2019-09-06 Fri 13:46 -->
+  <!-- 2019-09-07 Sat 19:15 -->
   <meta charset="utf-8">
   <meta name="viewport" content=
   "width=device-width, initial-scale=1">
@@ -254,40 +254,40 @@
       <div id="text-table-of-contents">
         <ul>
           <li>
-            <a href="#org909a836">Project goals</a>
+            <a href="#org3230139">Project goals</a>
           </li>
           <li>
-            <a href="#orgc0cc867">What was done over the course of
+            <a href="#org6bfc664">What was done over the course of
             project</a>
           </li>
           <li>
-            <a href="#orgf1d0b76">Methods</a>
+            <a href="#org012c720">Methods</a>
             <ul>
               <li>
-                <a href="#org7e023ea">Initial design</a>
+                <a href="#org8a7ea5e">Initial design</a>
               </li>
               <li>
-                <a href="#orgb45b613">Local optimization</a>
+                <a href="#orged858ed">Local optimization</a>
               </li>
               <li>
-                <a href="#org72fac47">Выбор ядра</a>
+                <a href="#org2ae0441">Kernel design</a>
               </li>
             </ul>
           </li>
           <li>
-            <a href="#org8425659">Results</a>
+            <a href="#org06fbd94">Results</a>
             <ul>
               <li>
-                <a href="#orga7855e8">GADMA datasets</a>
+                <a href="#org5f5f127">GADMA datasets</a>
               </li>
               <li>
-                <a href="#orgf05ae67">Out of Africa (2
+                <a href="#org72f60b0">Out of Africa (2
                 populations)</a>
               </li>
             </ul>
           </li>
           <li>
-            <a href="#org292fcd5">Conclusion</a>
+            <a href="#orgc63cb98">Conclusion</a>
           </li>
         </ul>
       </div>
@@ -296,9 +296,9 @@
       <p>Source code can be found <a href=
       "https://github.com/isheshukov/ifmoproject">here</a>.</p>
     </aside>
-    <div id="outline-container-org909a836" class="outline-2">
-      <h2 id="org909a836">Project goals</h2>
-      <div class="outline-text-2" id="text-org909a836">
+    <div id="outline-container-org3230139" class="outline-2">
+      <h2 id="org3230139">Project goals</h2>
+      <div class="outline-text-2" id="text-org3230139">
         <p>The project goal was to replace a BFGS optimization
         algorithm used in the tool moments with the Gaussian
         process based global Bayesian optimization and to study the
@@ -306,10 +306,10 @@
         accurate results of optimization in less time.</p>
       </div>
     </div>
-    <div id="outline-container-orgc0cc867" class="outline-2">
-      <h2 id="orgc0cc867">What was done over the course of
+    <div id="outline-container-org6bfc664" class="outline-2">
+      <h2 id="org6bfc664">What was done over the course of
       project</h2>
-      <div class="outline-text-2" id="text-orgc0cc867">
+      <div class="outline-text-2" id="text-org6bfc664">
         <ul class="org-ul">
           <li>5 datasets were tested with different parameters</li>
           <li>Automated report generation</li>
@@ -318,9 +318,9 @@
         </ul>
       </div>
     </div>
-    <div id="outline-container-orgf1d0b76" class="outline-2">
-      <h2 id="orgf1d0b76">Methods</h2>
-      <div class="outline-text-2" id="text-orgf1d0b76">
+    <div id="outline-container-org012c720" class="outline-2">
+      <h2 id="org012c720">Methods</h2>
+      <div class="outline-text-2" id="text-org012c720">
         <p>We used <a href=
         "https://github.com/SheffieldML/GPyOpt/"><code>GPyOpt</code></a>
         library that, given function and bounding conditions
@@ -351,9 +351,9 @@
           <li>Synthetic model of 5 populations</li>
         </ul>
       </div>
-      <div id="outline-container-org7e023ea" class="outline-3">
-        <h3 id="org7e023ea">Initial design</h3>
-        <div class="outline-text-3" id="text-org7e023ea">
+      <div id="outline-container-org8a7ea5e" class="outline-3">
+        <h3 id="org8a7ea5e">Initial design</h3>
+        <div class="outline-text-3" id="text-org8a7ea5e">
           <p>First phase of bayesian optimization is the so called
           <i>initial design</i>. It samples random points in a
           search space to better aid the actual optimization. So we
@@ -363,33 +363,77 @@
           дизайн был лучше.]</p>
         </div>
       </div>
-      <div id="outline-container-orgb45b613" class="outline-3">
-        <h3 id="orgb45b613">Local optimization</h3>
-        <div class="outline-text-3" id="text-orgb45b613">
+      <div id="outline-container-orged858ed" class="outline-3">
+        <h3 id="orged858ed">Local optimization</h3>
+        <div class="outline-text-3" id="text-orged858ed">
           <p>Bayesian optimization may not find the actual optimum
           of the function but point close to it. To pinpoint the
           actual optimum after the end of Bayesian optimization we
           employ the local one (BFGS).</p>
         </div>
       </div>
-      <div id="outline-container-org72fac47" class="outline-3">
-        <h3 id="org72fac47">Выбор ядра</h3>
-        <div class="outline-text-3" id="text-org72fac47">
-          <p>[TODO Вставить графики. Делали чтобы выбрать ядро,
-          недоделали.]</p>
+      <div id="outline-container-org2ae0441" class="outline-3">
+        <h3 id="org2ae0441">Kernel design</h3>
+        <div class="outline-text-3" id="text-org2ae0441">
+          <p>One of the most important hyperparameters of bayesian
+          optimization is kernel. Informally, kernel is a measure
+          of similarity between two points. Choice of kernel
+          direcly influences quality of approximation and therefore
+          optimum of a function.</p>
+          <p>We tried examining optimized function and trying to
+          come up with a better kernel for our functions. To do it
+          we tried projecting function in different ways which can
+          be seen at plots below:<br></p>
+          <figure id="org3697924">
+            <img src="./report_img/local.png" alt="local.png"
+            width="100%">
+            <figcaption>
+              <span class="figure-number">Figure 1:</span> 1
+              dimensional function projections (blue line is a
+              projection of found optimum)
+            </figcaption>
+          </figure>
+          <figure id="org122ac0c">
+            <img src="./report_img/local_whole_space.png" alt=
+            "local_whole_space.png" width="100%">
+            <figcaption>
+              <span class="figure-number">Figure 2:</span> 1
+              dimensional function projections on whole space
+            </figcaption>
+          </figure>
+          <figure id="org682fbb2">
+            <img src="./report_img/local_2d.png" alt="local_2d.png"
+            width="100%">
+            <figcaption>
+              <span class="figure-number">Figure 3:</span> 2
+              dimensional function projections
+            </figcaption>
+          </figure>
+          <figure id="org8130657">
+            <img src="./report_img/local_2d_whole.png" alt=
+            "local_2d_whole.png" width="100%">
+            <figcaption>
+              <span class="figure-number">Figure 4:</span> 2
+              dimensional function projections on whole search
+              space
+            </figcaption>
+          </figure>
+          <p><br></p>
+          <p>Unfortunately, different kernel specific to our task
+          was not chosen due to lack of time.</p>
         </div>
       </div>
     </div>
-    <div id="outline-container-org8425659" class="outline-2">
-      <h2 id="org8425659">Results</h2>
-      <div class="outline-text-2" id="text-org8425659">
+    <div id="outline-container-org06fbd94" class="outline-2">
+      <h2 id="org06fbd94">Results</h2>
+      <div class="outline-text-2" id="text-org06fbd94">
         <p>We performed a number of test runs to compare tool based
         on Bayesian optimization with already known optimum values.
         These results can be seen in following tables:</p>
       </div>
-      <div id="outline-container-orga7855e8" class="outline-3">
-        <h3 id="orga7855e8">GADMA datasets</h3>
-        <div class="outline-text-3" id="text-orga7855e8">
+      <div id="outline-container-org5f5f127" class="outline-3">
+        <h3 id="org5f5f127">GADMA datasets</h3>
+        <div class="outline-text-3" id="text-org5f5f127">
           <aside>
             <p>Every model was tested 10 times.</p>
           </aside>
@@ -519,9 +563,9 @@
           </table>
         </div>
       </div>
-      <div id="outline-container-orgf05ae67" class="outline-3">
-        <h3 id="orgf05ae67">Out of Africa (2 populations)</h3>
-        <div class="outline-text-3" id="text-orgf05ae67">
+      <div id="outline-container-org72f60b0" class="outline-3">
+        <h3 id="org72f60b0">Out of Africa (2 populations)</h3>
+        <div class="outline-text-3" id="text-org72f60b0">
           <aside>
             <p>Model ran 50 times. Known optimum is -1066.822.</p>
           </aside>
@@ -554,9 +598,9 @@
         </div>
       </div>
     </div>
-    <div id="outline-container-org292fcd5" class="outline-2">
-      <h2 id="org292fcd5">Conclusion</h2>
-      <div class="outline-text-2" id="text-org292fcd5">
+    <div id="outline-container-orgc63cb98" class="outline-2">
+      <h2 id="orgc63cb98">Conclusion</h2>
+      <div class="outline-text-2" id="text-orgc63cb98">
         <p>Results show that new method may be faster than
         <code>GADMA</code> for datasets with more than 3
         populations and works more or less the same for small
